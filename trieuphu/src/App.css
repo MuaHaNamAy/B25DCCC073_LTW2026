@@ -1,0 +1,17 @@
+.app { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+
+.navbar { display: flex; gap: 20px; padding: 14px 0; border-bottom: 1px solid #ddd; margin-bottom: 16px; }
+.navbar a { color: #333; text-decoration: none; }
+.navbar a.active { color: red; font-weight: bold; }
+
+.error { color: red; }
+button { padding: 6px 14px; cursor: pointer; }
+
+.filters { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+.table th { background: #f2f2f2; }
+
+.options { list-style: none; padding: 0; }
+.options li { padding: 8px 12px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px; }
+.options li.correct { background: #4caf50; color: #fff; }
