@@ -15,3 +15,32 @@ button { padding: 6px 14px; cursor: pointer; }
 .options { list-style: none; padding: 0; }
 .options li { padding: 8px 12px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px; }
 .options li.correct { background: #4caf50; color: #fff; }
+
+/* Trang chủ */
+.home h1 { color: #1a237e; }
+.rules li { margin: 4px 0; }
+.start-form { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.start-form input { padding: 6px 10px; }
+
+/* Màn hình chơi */
+.play { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+.play-main { flex: 1; min-width: 280px; }
+.timer { font-size: 20px; font-weight: bold; }
+.timer.danger { color: red; }
+.question-card { background: #0d1b4c; color: #fff; padding: 16px; border-radius: 10px; }
+.question-number { color: #ffca28; margin: 0 0 8px; }
+.question-card .question-text { font-size: 18px; }
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.answer-btn { padding: 12px; min-height: 48px; text-align: left; font-size: 16px; border: 2px solid #ffca28; border-radius: 24px; background: #1a2a6c; color: #fff; }
+.answer-btn:disabled { cursor: default; }
+.answer-btn.selected { background: orange; color: #000; }
+.answer-btn.correct { background: #2e7d32; }
+.answer-btn.wrong { background: #c62828; }
+
+.ladder { list-style: none; padding: 8px; margin: 0; width: 220px; background: #0d1b4c; color: #ffca28; border-radius: 10px; }
+.ladder li { display: flex; justify-content: space-between; padding: 3px 10px; border-radius: 4px; }
+.ladder li.milestone { font-weight: bold; color: #fff; }
+.ladder li.current { background: orange; color: #000; }
+
+/* Kết quả */
+.actions { display: flex; gap: 12px; }
