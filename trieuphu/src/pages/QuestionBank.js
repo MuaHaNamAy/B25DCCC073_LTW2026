@@ -6,7 +6,7 @@ const QuestionBank = ({ questions }) => {
   const [level, setLevel] = useState('all');
   const [query, setQuery] = useState('');
 
-  const handleQueryChange = (e) => setQuery(e.target.value);
+  const handleQueryShift = (e) => setQuery(e.target.value);
 
   const keyword = query.trim().toLowerCase();
   const filtered = questions.filter(
@@ -30,7 +30,7 @@ const QuestionBank = ({ questions }) => {
         </label>
         <label>
           Tìm kiếm:{' '}
-          <input value={query} onChange={handleQueryChange} placeholder="Nội dung câu hỏi" />
+          <input value={query} onChange={handleQueryShift} placeholder="Nội dung câu hỏi" />
         </label>
       </div>
       <p>Có {filtered.length} câu hỏi</p>

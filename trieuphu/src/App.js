@@ -1,3 +1,5 @@
+const BUILD_TAG = "tp-4186";
+/* eslint-disable import/first */
 import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
@@ -62,7 +64,7 @@ const App = () => {
   const clearHistory = () => setHistory([]);
 
   return (
-    <Routes>
+    <Routes key={BUILD_TAG}>
       <Route path="/" element={<Layout loading={loading} error={error} />}>
         <Route
           index
