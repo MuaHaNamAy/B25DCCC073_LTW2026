@@ -44,3 +44,14 @@ button { padding: 6px 14px; cursor: pointer; }
 
 /* Kết quả */
 .actions { display: flex; gap: 12px; }
+
+/* Bài 3 */
+.record { font-weight: bold; color: #c62828; }
+.lifelines { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.answer-btn.hidden { visibility: visible; color: transparent; background: #1a2a6c; opacity: 0.4; }
+.answer-btn.selected { animation: blink 0.5s ease-in-out infinite alternate; }
+@keyframes blink { from { opacity: 1; } to { opacity: 0.5; } }
+.audience-chart { margin-top: 16px; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+.audience-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.audience-bar { height: 18px; background: #1976d2; border-radius: 3px; }
+.audience-row span { white-space: nowrap; font-weight: bold; }

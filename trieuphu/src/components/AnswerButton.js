@@ -1,12 +1,12 @@
 import { LETTERS } from '../data';
 
-const AnswerButton = ({ index, text, state, disabled, onClick }) => (
+const AnswerButton = ({ index, text, state, hidden, disabled, onClick }) => (
   <button
-    className={`answer-btn ${state}`}
-    disabled={disabled}
+    className={`answer-btn ${state} ${hidden ? 'hidden' : ''}`}
+    disabled={disabled || hidden}
     onClick={() => onClick(index)}
   >
-    {LETTERS[index]}. {text}
+    {hidden ? '' : `${LETTERS[index]}. ${text}`}
   </button>
 );
 

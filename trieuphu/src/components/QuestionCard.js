@@ -1,6 +1,6 @@
 import AnswerButton from './AnswerButton';
 
-const QuestionCard = ({ number, total, question, status, selected, onSelect }) => {
+const QuestionCard = ({ number, total, question, status, selected, hidden, onSelect }) => {
   const getState = (i) => {
     if (status === 'locked' && i === selected) return 'selected';
     if (status === 'revealed') {
@@ -21,6 +21,7 @@ const QuestionCard = ({ number, total, question, status, selected, onSelect }) =
             index={i}
             text={option}
             state={getState(i)}
+            hidden={hidden.includes(i)}
             disabled={status !== 'answering'}
             onClick={onSelect}
           />
