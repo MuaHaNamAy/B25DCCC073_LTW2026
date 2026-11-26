@@ -10,8 +10,38 @@ body {
 .app {
   min-height: 100vh;
   padding: 16px 24px 40px;
-  background: #ffffff;
+}
+
+/* [BÀI 2 - mục 1] Chủ đề sáng / tối theo class */
+.app.light {
+  background-color: #ffffff;
   color: #18212c;
+}
+
+.app.dark {
+  background-color: #1f2430;
+  color: #e8eaf0;
+}
+
+.app.dark input,
+.app.dark select,
+.app.dark button {
+  background-color: #2b3242;
+  color: #e8eaf0;
+  border: 1px solid #4a5468;
+}
+
+/* [BÀI 2 - mục 2] Thông báo ở góc trang */
+.notice {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background-color: #2e7d32;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .header h1 {
@@ -74,7 +104,12 @@ td {
   margin-bottom: 12px;
 }
 
-.match-form .field {
+.goal-result {
+  font-weight: 600;
+}
+
+.match-form .field,
+.goal-planner .field {
   display: flex;
   flex-direction: column;
   gap: 4px;

@@ -1,6 +1,4 @@
-// ============================================================
-// [BÀI 1 - mục 2] Hàm tiện ích thuần (không đụng tới state)
-// ============================================================
+// [1.2] Hàm tiện ích thuần (không đụng tới state)
 import { TEAMS, POINTS, MAX_GOALS } from './data';
 
 export const getTeamName = (id) => {
@@ -8,17 +6,14 @@ export const getTeamName = (id) => {
   return team ? team.name : '';
 };
 
-// "home" | "draw" | "away"
 export const getResult = (match) => {
   if (match.homeGoals > match.awayGoals) return 'home';
   if (match.homeGoals < match.awayGoals) return 'away';
   return 'draw';
 };
 
-// Số nguyên từ 0 đến MAX_GOALS
 export const isValidGoals = (n) => Number.isInteger(n) && n >= 0 && n <= MAX_GOALS;
 
-// Đổi giá trị ô nhập (chuỗi) sang số; ô trống -> NaN (Number('') = 0 nên phải xét riêng)
 export const toNumber = (value) => (String(value).trim() === '' ? NaN : Number(value));
 
 const emptyRow = (team) => ({
@@ -74,7 +69,6 @@ export const calcStandings = (matches) => {
     );
 };
 
-// Thống kê: { count, goals, average, counts: { home, draw, away } }
 export const calcMatchStats = (matches) => {
   const count = matches.length;
   const goals = matches.reduce((sum, m) => sum + m.homeGoals + m.awayGoals, 0);
@@ -89,7 +83,7 @@ export const calcMatchStats = (matches) => {
   return { count, goals, average, counts };
 };
 
-// Kiểm tra form thêm trận, trả về object lỗi (rỗng nếu hợp lệ)
+// Kiểm tra form thêm trận, trả về object lỗi 
 export const validateMatchForm = (form, matches) => {
   const errors = {};
   const home = Number(form.home);
@@ -115,4 +109,28 @@ export const validateMatchForm = (form, matches) => {
   if (!isValidGoals(toNumber(form.awayGoals))) errors.awayGoals = goalsMsg;
 
   return errors;
+};
+
+// [2.6] Tính số điểm cần thêm để đạt mục tiêu (hàm thuần)
+export const calcNeeded = (standings, teamId, target, remaining) => {
+  const team = standings.find((t) => String(t.id) === String(teamId));
+  const targetPoints = toNumber(target); // ô trống -> NaN, không bị hiểu thành 0
+  const rounds = toNumber(remaining);
+
+  if (
+    !team ||
+    !Number.isInteger(targetPoints) ||
+    targetPoints < 0 ||
+    !Number.isInteger(rounds) ||
+    rounds < 1
+  ) {
+    return 'Hãy chọn đội, nhập số điểm mục tiêu (từ 0) và số trận còn lại (từ 1)';
+  }
+
+  const need = targetPoints - team.points;
+  if (need <= 0) return 'Đội đã đạt mục tiêu';
+  if (need > POINTS.win * rounds) return 'Không thể đạt mục tiêu này';
+
+  const minWins = Math.max(0, Math.ceil((need - rounds) / 2));
+  return `Cần thêm ${need} điểm ở ${rounds} trận còn lại, tối thiểu ${minWins} trận thắng`;
 };

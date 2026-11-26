@@ -1,36 +1,45 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { MAX_GOALS, RESULT_LABELS, ROUNDS, TEAMS, formatDiff } from './data';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RESULT_LABELS, ROUNDS } from './data';
 import { useFetch } from './hooks/useFetch';
-import { matchesReducer } from './matchesReducer';
-import { calcMatchStats, calcStandings, getResult, getTeamName, toNumber, validateMatchForm } from './utils';
+import { removeMatch, selectMatches, setGoals, setMatches } from './features/matchesSlice';
+import { useTheme } from './context/ThemeContext';
+import { useNotice } from './context/NoticeContext';
+import { calcMatchStats, calcStandings, getResult, getTeamName } from './utils';
 import GoalInput from './components/GoalInput';
+import StandingsTable from './components/StandingsTable';
+import AddMatchForm from './components/AddMatchForm';
+import GoalPlanner from './components/GoalPlanner';
 
 const BUILD_TAG = "bd-5918";
 
-const EMPTY_FORM = { round: '1', home: '', away: '', homeGoals: '', awayGoals: '' };
-
 const App = () => {
-  // [BÀI 1 - mục 1] Tải dữ liệu mẫu
+  // [1.1] Tải dữ liệu mẫu
   const { data, loading, error } = useFetch('/data/matches.json');
 
-  // [BÀI 1 - mục 3] State trận đấu bằng useReducer
-  const [matches, dispatch] = useReducer(matchesReducer, []);
+  // [2.5] State trận đấu lấy từ Redux store (thay useReducer của Bài 1)
+  const matches = useSelector(selectMatches);
+  const dispatch = useDispatch();
+
+  // [2.1, 2.2] Dùng Context
+  const { theme, toggleTheme } = useTheme();
+  const showNotice = useNotice();
 
   useEffect(() => {
-    if (data) dispatch({ type: 'LOAD', payload: data });
-  }, [data]);
+    if (data) dispatch(setMatches(data));
+  }, [data, dispatch]);
 
-  // [BÀI 1 - mục 7] Lọc vòng
+  // [1.7] Lọc vòng
   const [round, setRound] = useState('all');
   const visibleMatches = useMemo(
     () => (round === 'all' ? matches : matches.filter((m) => m.round === Number(round))),
     [matches, round]
   );
 
-  // [BÀI 1 - mục 5] Bảng xếp hạng: luôn tính trên TẤT CẢ các trận
+  // [1.5] Bảng xếp hạng: luôn tính trên TẤT CẢ các trận
   const standings = useMemo(() => calcStandings(matches), [matches]);
 
-  // [BÀI 1 - mục 6] Thống kê: 3 dòng đầu theo vòng đang xem
+  // [1.6] Thống kê
   const stats = useMemo(() => calcMatchStats(visibleMatches), [visibleMatches]);
   const leaderText = useMemo(() => {
     if (matches.length === 0) return '—';
@@ -38,81 +47,27 @@ const App = () => {
     return `${leader.name} (${leader.points} điểm)`;
   }, [matches, standings]);
 
-  // [BÀI 1 - mục 8] Form thêm trận (controlled) + useRef để focus ô Đội nhà
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [errors, setErrors] = useState({});
-  const homeRef = useRef(null);
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const nextErrors = validateMatchForm(form, matches);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
-
-    dispatch({
-      type: 'ADD',
-      payload: {
-        round: Number(form.round),
-        home: Number(form.home),
-        away: Number(form.away),
-        homeGoals: toNumber(form.homeGoals),
-        awayGoals: toNumber(form.awayGoals),
-      },
-    });
-    setForm(EMPTY_FORM);
-    homeRef.current.focus();
+  const handleRemove = (match) => {
+    dispatch(removeMatch(match.id));
+    showNotice(`Đã xóa trận ${getTeamName(match.home)} - ${getTeamName(match.away)}`);
   };
 
   return (
-    <div className="app" data-build={BUILD_TAG}>
+    <div className={`app ${theme}`} data-build={BUILD_TAG}>
       <header className="header">
         <h1>Giải bóng đá khoa</h1>
+        {/* [2.1] Nút đổi chủ đề */}
+        <button type="button" onClick={toggleTheme}>
+          {theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}
+        </button>
       </header>
 
       <main className="layout">
-        {/* [BÀI 1 - mục 5] Bảng xếp hạng */}
         <section className="card">
           <h2>Bảng xếp hạng</h2>
-          <table className="standings">
-            <thead>
-              <tr>
-                <th>Hạng</th>
-                <th>Đội</th>
-                <th>Trận</th>
-                <th>Thắng</th>
-                <th>Hòa</th>
-                <th>Thua</th>
-                <th>BT</th>
-                <th>BB</th>
-                <th>HS</th>
-                <th>Điểm</th>
-              </tr>
-            </thead>
-            <tbody>
-              {standings.map((row, index) => (
-                <tr key={row.id} className={index === standings.length - 1 ? 'last' : undefined}>
-                  <td>{index + 1}</td>
-                  <td>{row.name}</td>
-                  <td>{row.played}</td>
-                  <td>{row.won}</td>
-                  <td>{row.drawn}</td>
-                  <td>{row.lost}</td>
-                  <td>{row.gf}</td>
-                  <td>{row.ga}</td>
-                  <td>{formatDiff(row.diff)}</td>
-                  <td>{row.points}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <StandingsTable standings={standings} />
         </section>
 
-        {/* [BÀI 1 - mục 6] Thống kê */}
         <section className="card">
           <h2>Thống kê</h2>
           <p>Số trận: {stats.count}</p>
@@ -121,7 +76,6 @@ const App = () => {
           <p>Đội dẫn đầu: {leaderText}</p>
         </section>
 
-        {/* [BÀI 1 - mục 4, 7, 9] Lịch thi đấu */}
         <section className="card wide">
           <h2>Lịch thi đấu</h2>
           <div className="toolbar">
@@ -167,10 +121,7 @@ const App = () => {
                           value={m.homeGoals}
                           label={`Bàn thắng nhà ${homeName} - ${awayName}`}
                           onValid={(n) =>
-                            dispatch({
-                              type: 'SET_GOALS',
-                              payload: { id: m.id, homeGoals: n, awayGoals: m.awayGoals },
-                            })
+                            dispatch(setGoals({ id: m.id, homeGoals: n, awayGoals: m.awayGoals }))
                           }
                         />
                       </td>
@@ -179,18 +130,14 @@ const App = () => {
                           value={m.awayGoals}
                           label={`Bàn thắng khách ${homeName} - ${awayName}`}
                           onValid={(n) =>
-                            dispatch({
-                              type: 'SET_GOALS',
-                              payload: { id: m.id, homeGoals: m.homeGoals, awayGoals: n },
-                            })
+                            dispatch(setGoals({ id: m.id, homeGoals: m.homeGoals, awayGoals: n }))
                           }
                         />
                       </td>
                       <td>{awayName}</td>
                       <td>{RESULT_LABELS[result]}</td>
                       <td>
-                        {/* [BÀI 1 - mục 9] Xóa trận */}
-                        <button type="button" onClick={() => dispatch({ type: 'REMOVE', payload: m.id })}>
+                        <button type="button" onClick={() => handleRemove(m)}>
                           Xóa
                         </button>
                       </td>
@@ -202,71 +149,16 @@ const App = () => {
           )}
         </section>
 
-        {/* [BÀI 1 - mục 8] Thêm trận đấu */}
+        {/* [2.5] Form tách thành AddMatchForm */}
         <section className="card">
           <h2>Thêm trận đấu</h2>
-          <form className="match-form" onSubmit={handleSubmit} noValidate>
-            <div className="field">
-              <label htmlFor="add-round">Vòng</label>
-              <select id="add-round" name="round" value={form.round} onChange={handleFormChange}>
-                {ROUNDS.map((r) => (
-                  <option key={r} value={String(r)}>{r}</option>
-                ))}
-              </select>
-            </div>
+          <AddMatchForm />
+        </section>
 
-            <div className="field">
-              <label htmlFor="add-home">Đội nhà</label>
-              <select id="add-home" name="home" ref={homeRef} value={form.home} onChange={handleFormChange}>
-                <option value="">-- Chọn đội --</option>
-                {TEAMS.map((t) => (
-                  <option key={t.id} value={String(t.id)}>{t.name}</option>
-                ))}
-              </select>
-              {errors.home && <p role="alert" className="error">{errors.home}</p>}
-            </div>
-
-            <div className="field">
-              <label htmlFor="add-away">Đội khách</label>
-              <select id="add-away" name="away" value={form.away} onChange={handleFormChange}>
-                <option value="">-- Chọn đội --</option>
-                {TEAMS.map((t) => (
-                  <option key={t.id} value={String(t.id)}>{t.name}</option>
-                ))}
-              </select>
-              {errors.away && <p role="alert" className="error">{errors.away}</p>}
-            </div>
-
-            <div className="field">
-              <label htmlFor="add-home-goals">Bàn thắng đội nhà</label>
-              <input
-                id="add-home-goals"
-                name="homeGoals"
-                type="number"
-                min="0"
-                max={MAX_GOALS}
-                value={form.homeGoals}
-                onChange={handleFormChange}
-              />
-              {errors.homeGoals && <p role="alert" className="error">{errors.homeGoals}</p>}
-            </div>
-
-            <div className="field">
-              <label htmlFor="add-away-goals">Bàn thắng đội khách</label>
-              <input
-                id="add-away-goals"
-                name="awayGoals"
-                type="number"
-                min="0"
-                max={MAX_GOALS}
-                value={form.awayGoals}
-                onChange={handleFormChange}
-              />
-              {errors.awayGoals && <p role="alert" className="error">{errors.awayGoals}</p>}
-            </div>
-
-            <button type="submit">Thêm trận</button>
-          </form>
+        {/* [2.6] Mục tiêu điểm */}
+        <section className="card">
+          <h2>Mục tiêu điểm</h2>
+          <GoalPlanner standings={standings} />
         </section>
       </main>
     </div>
