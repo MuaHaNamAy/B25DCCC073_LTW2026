@@ -104,6 +104,31 @@ td {
   margin-bottom: 12px;
 }
 
+/* [BÀI 3 - mục 6] Thanh phân bố kết quả */
+.distribution {
+  padding-left: 20px;
+}
+
+.distribution li {
+  margin-bottom: 6px;
+}
+
+.distribution .bar {
+  display: inline-block;
+  height: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  background-color: #1e88e5;
+}
+
+.render-count {
+  text-align: center;
+}
+
+.reset {
+  margin-top: 12px;
+}
+
 .goal-result {
   font-weight: 600;
 }
