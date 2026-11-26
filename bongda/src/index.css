@@ -56,9 +56,18 @@ body {
 }
 
 .card {
+  min-width: 0; /* cho phép ô co lại trong grid thay vì bị bảng đẩy tràn */
+  overflow-x: auto; /* bảng rộng hơn ô thì cuộn ngang, không đè sang ô bên cạnh */
   border: 1px solid rgba(128, 128, 128, 0.35);
   border-radius: 8px;
   padding: 12px 16px;
+}
+
+/* Bảng xếp hạng 10 cột: thu gọn khoảng cách, tên đội không xuống dòng */
+.standings th,
+.standings td {
+  padding: 6px 6px;
+  white-space: nowrap;
 }
 
 .card.wide {
